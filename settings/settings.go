@@ -45,8 +45,8 @@ var APPCONFIG = Config{
 		Version:   "1.0.0",
 		Mode:      "dev", // 开发模式,则引入 swagger, 否则不引入 swagger
 		Port:      9113,
-		ImgPath:   "./assets", // 图片的路径
-		BatchSize: 1000,       //(未使用)
+		ImgPath:   "./assets3", // 图片的路径
+		BatchSize: 1000,        //(未使用)
 	},
 	Log: LogConfig{
 		Level:      "debug",           // 日志级别(没有用到)

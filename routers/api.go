@@ -124,26 +124,32 @@ func RenameWithMd5(tempFilePath, imgDir, fileName string, calculateMd5 func(stri
 func RandomImage(ip *utils.ImageProcessor) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		// 使用提取的路径处理函数
+		// 1. 解析查询参数
 		params := ParseQueryParams(c)
 		//  params 是 *QueryParams 类型,  在 go 中, 可以直接使用点操作符访问字段:  index := params.Index
 		// 								          也可以使用 &params 的方式:   index := (&params).Index
 		// 如果params.Sub 为空,则返回源数据
+		// 2. 获取图像信息
 		var info *utils.ImageInfo
+		var path string
 		if params.Index >= 0 {
 			info = ip.FilterBySub(params.Sub).GetByIndex(params.Index).FirstInfo()
 		} else {
 			// info = ip.FilterBySub(params.Sub).RandomImageInfo()  //下面等价
 			info = ip.RandomImageInfo()
 		}
+		// 3. 如果查询不到数据，返回404错误
 		if info == nil {
 			slog.Error("根据条件查询不到数据")
 			c.JSON(http.StatusNotFound, NOFILE)
 			return
 		}
-		path := filepath.Join(info.Sub, info.File)
-		ext := strings.ToLower(filepath.Ext(path)) //获取扩展名, 带点
-		// 返回处理后的图像
+		// 4. 生成文件路径和扩展名
+		path = filepath.Join(info.Sub, info.File)
+		ext := strings.ToLower(filepath.Ext(path))             //获取扩展名, 带点
+		contextType := "image/" + strings.TrimPrefix(ext, ".") //获取扩展名, 并去掉扩展名前的点
+
+		// 5. 检查客户端是否要求返回 JSON 格式
 		accept := c.GetHeader("Accept")
 		if accept == "application/json" {
 			c.JSON(http.StatusOK, ResponseImageInfo{
@@ -152,38 +158,38 @@ func RandomImage(ip *utils.ImageProcessor) gin.HandlerFunc {
 			})
 			return
 		}
-		contextType := "image/" + strings.TrimPrefix(ext, ".") //获取扩展名, 并去掉扩展名前的点
-		if strings.ToLower(ext) == ".webp" {
-			img1, _ := os.ReadFile(path)
-
-			c.Header("Content-Disposition", fmt.Sprintf(`inline; filename="image_%s"`, filepath.Base(path)))
-			c.Header("Content-Type", contextType)
-			c.Data(http.StatusOK, contextType, img1)
-		} else {
-			newImage, err := pics.ProcessImage(path, params.Width, params.Height)
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, NOFILE)
-				return
-			}
-			// 设置Content-Disposition响应头，指定为附件下载，并为下载文件命名
-			// inline：表示文件会在浏览器中打开（如果浏览器支持），但不会自动下载。
-			// attachment: 表示以附件形式下载数据。
-			// filename="image_title.ext"：指定了文件的名称，浏览器通常会将其作为下载时的默认文件名。
-			// 从 path 中提取文件名,build/assets/upload/image.png -> image.png, 采用: filepath.Base 函数即可
-			c.Header("Content-Disposition", fmt.Sprintf(`inline; filename="image_%s"`, filepath.Base(path)))
-			c.Header("Content-Type", contextType)
-			c.Data(http.StatusOK, contextType, newImage)
+		// 6. 读取并处理图像数据(返回二进制数据)
+		bytedata, err := pics.LoadImageData(path, ext, params.Width, params.Height)
+		if err != nil {
+			slog.Error("处理图片时出错", slog.String("err", err.Error()), slog.String("path", path))
+			c.JSON(http.StatusInternalServerError, NOFILE)
 			return
-
 		}
+		// 设置Content-Disposition响应头，指定为附件下载，并为下载文件命名
+		// inline：表示文件会在浏览器中打开（如果浏览器支持），但不会自动下载。
+		// attachment: 表示以附件形式下载数据。
+		// filename="image_title.ext"：指定了文件的名称，浏览器通常会将其作为下载时的默认文件名。
+		// 从 path 中提取文件名,build/assets/upload/image.png -> image.png, 采用: filepath.Base 函数即可
+		c.Header("Content-Disposition", fmt.Sprintf(`inline; filename="image_%s"`, filepath.Base(path)))
+		c.Header("Content-Type", contextType)
+		c.Data(http.StatusOK, contextType, bytedata)
 	}
 }
 
 // ParseQueryParams 解析查询参数
 func ParseQueryParams(c *gin.Context) *QueryParams {
+	//获取中间件的值
+	// 从上下文中获取设备类型
+	deviceType, _ := c.Get("device_type")
+	defaultWidth := 0 //
+
+	if deviceType != "pc" {
+		defaultWidth = 300 // 移动端默认宽度为300
+	}
+
 	params := &QueryParams{
 		Sub:    c.DefaultQuery("sub", ""),
-		Width:  parseQueryParam(c, "width", 0),
+		Width:  parseQueryParam(c, "width", defaultWidth),
 		Height: parseQueryParam(c, "height", 0),
 		Index:  parseQueryParam(c, "index", -1),
 	}

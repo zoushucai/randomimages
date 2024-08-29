@@ -29,7 +29,7 @@ func Setup(fav embed.FS) *gin.Engine {
 
 	// 使用 cors 中间件--- 第三方包
 	r.Use(cors.Default())
-
+	r.Use(middlewares.DeviceTypeMiddleware()) // 设置设备类型
 	// 设置可信代理 IP
 	r.SetTrustedProxies([]string{
 		"127.0.0.1",      // 本地 IP4

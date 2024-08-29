@@ -254,8 +254,6 @@ func (ip *ImageProcessor) RandomImageInfo() *ImageInfo {
 		return nil
 	}
 	// 使用当前时间作为随机数生成器的种子
-	// 生成一个随机索引
-	fmt.Println("len(*ip.SaveDb): ", len(*ip.SaveDb))
 	randomIndex := rand.IntN(len(*ip.SaveDb))
 	// 返回随机选择的 ImageInfo
 	return (*ip.SaveDb)[randomIndex]
