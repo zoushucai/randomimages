@@ -1,0 +1,13 @@
+﻿services:
+  randomimages:
+    container_name: randomimages-server
+    # image: qqzsc/randomimages:latest
+    # image: ghcr.io/zoushucai/randomimages:latest
+    image: randomimg:v1 #(本地测试)
+    restart: always
+    ports:
+      - "9113:9113"
+    volumes:
+      # 需要准好图片资源文件夹
+      - /home/ubuntu/mygithub/m19-ginimg2/assets3:/app/assets
+      - ./logs:/app/logs
