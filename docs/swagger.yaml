@@ -7,7 +7,6 @@ definitions:
       msg:
         type: string
     type: object
-host: localhost:9113
 info:
   contact:
     email: zscmoyujian@gmail.com

@@ -20,7 +20,6 @@ var fav embed.FS
 // @version		1.0
 // @description	API 详细的描述信息 ......
 // @BasePath		/
-// @Host			localhost:9113
 // @contact.name	zsc
 // @contact.url	https://github.com/zoushucai/random-images
 // @contact.email	zscmoyujian@gmail.com
