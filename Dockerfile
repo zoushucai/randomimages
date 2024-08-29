@@ -19,8 +19,8 @@ FROM alpine:latest
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/Shanghai
 ENV TZ=Asia/Shanghai
-
 WORKDIR /app
+USER 1000
 COPY --from=builder /app/main /app/main
 EXPOSE 9113
 CMD ["./main"]
