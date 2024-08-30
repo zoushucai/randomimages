@@ -55,6 +55,24 @@ paths:
       summary: 随机返回一张图片
       tags:
       - v1
+  /v1/randomsrc:
+    get:
+      consumes:
+      - text/plain
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: "images path\"\t\"Success"
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: 随机返回一张图片的地址(以字符串的方式返回,不接受任何参数)
+      tags:
+      - v1
   /v1/upload:
     post:
       consumes:

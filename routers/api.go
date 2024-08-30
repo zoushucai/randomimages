@@ -176,6 +176,30 @@ func RandomImage(ip *utils.ImageProcessor) gin.HandlerFunc {
 	}
 }
 
+// RandomImageSrc godoc
+//
+//	@Summary		随机返回一张图片的地址(以字符串的方式返回,不接受任何参数)
+//	@Tags			v1
+//	@Accept			plain
+//	@Produce		plain
+//	@Failure		404		 {string}	 string	 ""
+//	@Success		200		 {string}	 "images path"	"Success"
+//	@Router			/v1/randomsrc [get]
+func RandomImageSrc(ip *utils.ImageProcessor) gin.HandlerFunc {
+	// 不支持任何查询操作
+	return func(c *gin.Context) {
+		info := ip.RandomImageInfo()
+		// 3. 如果查询不到数据，返回空
+		if info == nil {
+			c.String(http.StatusNotFound, "")
+			return
+		}
+		path := filepath.Join(info.Sub, info.File)
+		fullpath := filepath.Join(c.Request.Host, path)
+		c.String(http.StatusOK, fullpath)
+	}
+}
+
 // ParseQueryParams 解析查询参数
 func ParseQueryParams(c *gin.Context) *QueryParams {
 	//获取中间件的值

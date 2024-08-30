@@ -126,3 +126,9 @@ go build -ldflags="-s -w" -o main-mac-arm64 main.go
 ## 增加 webp 的支持
 
 - 不引入 cgo, 因为对图片的裁剪是不成功的, 由于涉及图片拷贝等操作, 镜像 scratch 难以胜任, 因此选 alpine:latest 为基础镜像
+
+## api 接口,
+
+- 直接从 swagger 进行查看
+
+- 地址: http://localhost:9113/swagger/index.html

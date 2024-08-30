@@ -69,8 +69,9 @@ func RegisterRoutes(r *gin.Engine, ip *utils.ImageProcessor) {
 	v1 := r.Group("/v1")
 	{
 		// 传统的传参
-		v1.GET("/random", RandomImage(ip)) // 随机获取图片
-		v1.POST("/upload", FileUpload(ip)) // 上传图片
+		v1.GET("/random", RandomImage(ip))       // 随机获取图片
+		v1.POST("/upload", FileUpload(ip))       // 上传图片
+		v1.GET("/randomsrc", RandomImageSrc(ip)) // 随机获取图片地址, 是字符串
 	}
 	// 添加 404 路由
 	r.NoRoute(func(c *gin.Context) {

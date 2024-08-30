@@ -71,6 +71,34 @@
                 }
             }
         },
+        "/v1/randomsrc": {
+            "get": {
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "v1"
+                ],
+                "summary": "随机返回一张图片的地址(以字符串的方式返回,不接受任何参数)",
+                "responses": {
+                    "200": {
+                        "description": "images path\"\t\"Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/upload": {
             "post": {
                 "description": "该接口接收一个文件，将其保存到服务器，并将文件信息（包括 MD5 值、文件名、宽高等）存储在内存中",
