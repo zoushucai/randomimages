@@ -41,12 +41,12 @@ type Config struct {
 // 全局配置变量
 var APPCONFIG = Config{
 	App: AppConfig{
-		Name:      "webapp",
-		Version:   "1.0.0",
-		Mode:      "dev", // 开发模式,则引入 swagger, 否则不引入 swagger
-		Port:      9113,
+		Name:      "webapp",   //应用名称
+		Version:   "1.0.0",    //版本信息
+		Mode:      "dev",      // 开发模式,则引入 swagger, 否则不引入 swagger
+		Port:      9113,       //端口
 		ImgPath:   "./assets", // 图片的路径
-		BatchSize: 1000,       //(未使用)
+		BatchSize: 1000,       //(未使用,原本打算批量操作,利用异步读取,但是发现用不到)
 	},
 	Log: LogConfig{
 		Level:      "debug",           // 日志级别(没有用到)
@@ -66,11 +66,9 @@ ParseFlags 解析命令行参数, 返回参数指针
 flag.Int 语法的定义命令行参数, 格式: 参数, 默认值, 注释
 */
 func ParseFlags() {
-
 	port := flag.Int("port", App.Port, "Port to run the server on")
 	imgDir := flag.String("imgdir", App.ImgPath, "Directory for images") // 定义 imgdir 参数，默认值为 ./assets
 	flag.Parse()                                                         // 解析命令行参数
-	// return port, imgDir
 	// 使用命令行参数覆盖默认配置
 	App.Port = *port
 	App.ImgPath = filepath.Clean(*imgDir)
