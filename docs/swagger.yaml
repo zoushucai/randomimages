@@ -29,10 +29,6 @@ paths:
         in: query
         name: sub
         type: string
-      - description: 图像目录下的子目录
-        in: query
-        name: sub
-        type: string
       - description: 图像宽度, 默认为 0,则是原始大小
         in: query
         name: width

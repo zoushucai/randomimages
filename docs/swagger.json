@@ -37,12 +37,6 @@
                         "in": "query"
                     },
                     {
-                        "type": "string",
-                        "description": "图像目录下的子目录",
-                        "name": "sub",
-                        "in": "query"
-                    },
-                    {
                         "type": "integer",
                         "description": "图像宽度, 默认为 0,则是原始大小",
                         "name": "width",
