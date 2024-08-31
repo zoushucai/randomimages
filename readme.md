@@ -6,8 +6,6 @@
 
 ## 使用方法 ( docker 安装)
 
-由于基于: `scratch` 镜像, 比较简洁,无法进入容器, 需要的话可以改为 `alpine`
-
 ```yaml
 services:
   randomimages:
@@ -29,10 +27,10 @@ services:
 
 - 假设: `url = http://localhost:9113/v1/random`
 
-- 访问 `url?format=xxx&sub=xxx&width=xxx&index=xxx` 即可获取指定的图片,(图片的类型包括: `jpeg, png, gif`)
+- 访问 `url?sub=xxx&width=xxx&height=xxx&index=xxx` 即可获取指定的图片,(图片的类型包括: `jpeg, png, gif`)
 
   - `sub`: 文件夹名称, 例如 `url?sub=cat` 即可获取 `assets/cat` 文件夹下的图片
-  - `width`: 图片宽度, 默认为 0
+  - `width`: 图片宽度, 默认为 0(pc 端), 非 pc 端默认为 300.
   - `height`: 图片高度, 默认为 0
 
     - 如果 `width` 和 `height` 都为 0, 则默认为原始图片的宽度
@@ -43,7 +41,7 @@ services:
 
   - 上述选项是可以组合使用的
 
-- 最好,使用域名+反向代理的方式来访问, 不然可能会有跨域问题
+- 新支持 webp, 由于 webp 的格式问题, 只能访问,不能调整大小
 
 ```bash
 
@@ -55,21 +53,23 @@ http://localhost:9113/v1/random?sub=dongman&index=0
 curl -H "Accept: application/json" http://localhost:9113/v1/random
 
 # 返回
-{"file":"localhost:9113/assets/renwu/00059-3052920575-masterpiece.png","message":"success"}
+{"file":"assets/renwu/00059-3052920575-masterpiece.png","message":"success"}
 # 这里的 file 是图片的 url, 直接把 assets 目录下的所有图片进行了挂载, 因此可以通过这个地址直接访问图片
 # message 是返回的提示信息
 
 
-# 还可以通过 swagger 来查看接口文档(已删除, 这个会使得编译后的体积大 3 倍,算了,删除)
+# 还可以通过 swagger 来查看接口文档(这个会使得编译后的体积大 3 倍,算了,还是添加上, 方便了解 api)
 # http://localhost:9113/swagger/index.html
 
 ```
+
+- 还提供图片上传的功能, 更多 api 细节参考: [http://localhost:9113/swagger/index.html](http://localhost:9113/swagger/index.html)
 
 ## 编译安装
 
 当然使用编译安装, 直接采用二进制文件部署,肯定体积更小
 
-- 1. 首先,准备好 go 环境, 以及必要的依赖.
+1. 首先,准备好 go 环境, 以及必要的依赖.
 
 ```bash
 wget https://go.dev/dl/go1.23.0.linux-amd64.tar.gz
@@ -82,25 +82,34 @@ rm go1.23.0.linux-amd64.tar.gz
 
 ```
 
-- 2. 准备好图片资源, 把图片放到 `assets` 目录下, 如果要对图片进行分类, 可以在 `assets` 目录下新建文件夹, 把图片放到对应的文件夹下. 例如 `assets/cat` 文件夹下的图片, 就是猫的图片.
+2. 准备好图片资源, 把图片放到 `assets` 目录下, 如果要对图片进行分类, 可以在 `assets` 目录下新建文件夹, 把图片放到对应的文件夹下. 例如 `assets/cat` 文件夹下的图片, 就是猫的图片.
 
-- 运行 `go mod init mygo` 来初始化项目
-
-- 运行 `go mod tidy` 来更新依赖
-
-- 运行 `go run main.go` 来启动服务
-
-- 访问 `http://localhost:9113/v1/random` 即可随机获取一张图片
-
-- 如果访问成功, 则可以 `go build -o main-mac-arm64 main.go` 来编译成二进制文件, 然后通过 `./main-mac-arm64` 来启动服务
+3. 准备好 go 环境, 并且安装好 go. 然后就是一些列的初始化工作
 
 ```bash
-# 编译的时候添加 -ldflags="-s -w" 可以减少二进制文件大小
-go build -ldflags="-s -w" -o main-mac-arm64 main.go
+# 1.初始化项目
+go mod init mygo
+
+# 2. 下载依赖
+go mod tidy
+
+# 3. 编译启动
+go run main.go
+
+# 4. 如果不报错, 就可以通过 http://localhost:9113/v1/random 访问图片
+
+# 5. 就可以打包成二进制文件
+go build -o main main.go
+
+# 6. 通过二进制文件启动
+./main
+
+# 7. 编译的时候添加 -ldflags="-s -w" 可以减少二进制文件大小
+go build -ldflags="-s -w" -o main main.go
 
 
-# 添加参数, 指定端口和图片路径
-./main-mac-arm64 --port=9113 --imgdir=imgs
+# 8添加参数, 指定端口和图片路径
+./main --port=9113 --imgdir=imgs
 
 ```
 
@@ -121,13 +130,13 @@ go build -ldflags="-s -w" -o main-mac-arm64 main.go
 
 ## 利用 action 进行自动编译
 
-- 参考仓库的 `.github/workflows` 文件
+- 参考本仓库的 `.github/workflows` 文件
 
 ## 增加 webp 的支持
 
-- 不引入 cgo, 因为对图片的裁剪是不成功的, 由于涉及图片拷贝等操作, 镜像 scratch 难以胜任, 因此选 alpine:latest 为基础镜像
+- 为了不引入 cgo, 因为对图片的裁剪是不成功的, 由于涉及图片拷贝等操作, 镜像 scratch 难以胜任, 因此选 alpine:latest 为基础镜像
 
-## api 接口,
+## api 接口
 
 - 直接从 swagger 进行查看
 

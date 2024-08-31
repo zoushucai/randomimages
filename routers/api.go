@@ -115,7 +115,6 @@ func RenameWithMd5(tempFilePath, imgDir, fileName string, calculateMd5 func(stri
 //	@Accept			json
 //	@Produce		json
 //	@Param			sub		query		string				false	"图像目录下的子目录"
-//	@Param			sub		query		string				false	"图像目录下的子目录"
 //	@Param			width	query		int					false	"图像宽度, 默认为 0,则是原始大小"
 //	@Param			height	query		int					false	"图像高度, 默认为 0,则是原始大小"
 //	@Param			index	query		int					false	"图像索引, 默认为 -1,则是随机"

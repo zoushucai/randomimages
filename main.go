@@ -46,8 +46,4 @@ func main() {
 	routers.RegisterRoutes(r, ip)
 	// 启动服务
 	r.Run(fmt.Sprintf("0.0.0.0:%v", settings.App.Port))
-	// // Swagger 路由
-	// if settings.App.Mode == "dev" {
-	// 	docs.SwaggerInfo.Host = fmt.Sprintf("0.0.0.0:%v", settings.App.Port)
-	// }
 }
