@@ -4,7 +4,15 @@
 
 - 图片来源于互联网, 主要来自 c 站
 
-## 使用方法 ( docker 安装)
+## 使用方法
+
+- docker 的安装
+- 二进制安装
+- 自行通过编译安装
+
+### 1.使用方法 ( docker 安装)
+
+- 1. 下载 docker-compose.yml 文件, 并且修改 `assets` 目录为实际图片资源目录
 
 ```yaml
 services:
@@ -23,51 +31,11 @@ services:
 
 然后运行 `sudo docker-compose up` 就可以通过 `http://localhost:9113/v1/random` 访问了
 
-## 参数说明
+## 2.使用方法 ( 二进制安装)
 
-- 假设: `url = http://localhost:9113/v1/random`
+- 从仓库下载对应平台的二进制文件, 然后解压,在终端中运行 `./randomimages` 即可启动服务
 
-- 访问 `url?sub=xxx&width=xxx&height=xxx&index=xxx` 即可获取指定的图片,(图片的类型包括: `jpeg, png, gif`)
-
-  - `sub`: 文件夹名称, 例如 `url?sub=cat` 即可获取 `assets/cat` 文件夹下的图片
-  - `width`: 图片宽度, 默认为 0(pc 端), 非 pc 端默认为 300.
-  - `height`: 图片高度, 默认为 0
-
-    - 如果 `width` 和 `height` 都为 0, 则默认为原始图片的宽度
-    - 如果二者只要一个为 0, 则调整为指定的宽高(保持比例)
-    - 如果都大于 0, 则调整到指定的宽高(拉伸)
-
-  - `index`: 索引, 例如 `url?index=1` 即可获取索引为 1 的图片(按顺序), 如果未指定, 则默认为随机获取
-
-  - 上述选项是可以组合使用的
-
-- 新支持 webp, 由于 webp 的格式问题, 只能访问,不能调整大小
-
-```bash
-
-# example -- 直接返回图片
-http://localhost:9113/v1/random?sub=dongman&index=0
-
-
-# 如果要返回 json,
-curl -H "Accept: application/json" http://localhost:9113/v1/random
-
-# 返回
-{"file":"assets/renwu/00059-3052920575-masterpiece.png","message":"success"}
-# 这里的 file 是图片的 url, 直接把 assets 目录下的所有图片进行了挂载, 因此可以通过这个地址直接访问图片
-# message 是返回的提示信息
-
-
-# 还可以通过 swagger 来查看接口文档(这个会使得编译后的体积大 3 倍,算了,还是添加上, 方便了解 api)
-# http://localhost:9113/swagger/index.html
-
-```
-
-- 还提供图片上传的功能, 更多 api 细节参考: [http://localhost:9113/swagger/index.html](http://localhost:9113/swagger/index.html)
-
-## 编译安装
-
-当然使用编译安装, 直接采用二进制文件部署,肯定体积更小
+### 3.使用方法 (自行通过编译安装,添加自己需要的)
 
 1. 首先,准备好 go 环境, 以及必要的依赖.
 
@@ -113,7 +81,49 @@ go build -ldflags="-s -w" -o main main.go
 
 ```
 
-### 关于 go 的 交叉编译
+## 参数说明
+
+- 假设: `url = http://localhost:9113/v1/random`
+
+- 访问 `url?sub=xxx&width=xxx&height=xxx&index=xxx` 即可获取指定的图片,(图片的类型包括: `jpeg, png, gif`)
+
+  - `sub`: 文件夹名称, 例如 `url?sub=cat` 即可获取 `assets/cat` 文件夹下的图片
+  - `width`: 图片宽度, 默认为 0(pc 端), 非 pc 端默认为 300.
+  - `height`: 图片高度, 默认为 0
+
+    - 如果 `width` 和 `height` 都为 0, 则默认为原始图片的宽度
+    - 如果二者只要一个为 0, 则调整为指定的宽高(保持比例)
+    - 如果都大于 0, 则调整到指定的宽高(拉伸)
+
+  - `index`: 索引, 例如 `url?index=1` 即可获取索引为 1 的图片(按顺序), 如果未指定, 则默认为随机获取
+
+  - 上述选项是可以组合使用的
+
+- 新支持 webp, 由于 webp 的格式问题, 只能访问,不能调整大小
+
+```bash
+
+# example -- 直接返回图片
+http://localhost:9113/v1/random?sub=dongman&index=0
+
+
+# 如果要返回 json,
+curl -H "Accept: application/json" http://localhost:9113/v1/random
+
+# 返回
+{"file":"assets/renwu/00059-3052920575-masterpiece.png","message":"success"}
+# 这里的 file 是图片的 url, 直接把 assets 目录下的所有图片进行了挂载, 因此可以通过这个地址直接访问图片
+# message 是返回的提示信息
+
+
+# 还可以通过 swagger 来查看接口文档(这个会使得编译后的体积大 3 倍,算了,还是添加上, 方便了解 api)
+# http://localhost:9113/swagger/index.html
+
+```
+
+- 还提供图片上传的功能, 更多 api 细节参考: [http://localhost:9113/swagger/index.html](http://localhost:9113/swagger/index.html)
+
+## 关于 go 的 交叉编译
 
 不想折腾, 推荐第三方程序: [goreleaser](https://github.com/goreleaser/goreleaser)
 
@@ -141,3 +151,25 @@ go build -ldflags="-s -w" -o main main.go
 - 直接从 swagger 进行查看
 
 - 地址: http://localhost:9113/swagger/index.html
+
+## 目录结构
+
+```bash
+├── Dockerfile
+├── assets        # 图片资源
+├── dbpk          # 数据库文件
+├── docs          # swagger生成的文档
+├── example       # 示例代码
+├── go.mod
+├── go.sum
+├── logger        # 日志配置
+├── main.go       # 入口文件
+├── middlewares   # 中间件
+├── pics          # 图片处理
+├── ports         # 强制杀死进程(暂时没用到)
+├── readme.md
+├── routers       # 路由
+├── settings      # 配置文件, 由于没有用配置文件,直接把配置文件写在 go 文件中
+├── static        # 静态文件
+└── utils         # 工具类
+```
